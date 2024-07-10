@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Botón para agregar nuevo producto -->
+<button type="button" class="btn btn-success" data-toggle="modal" data-target="#agregarModal">
+  Agregar Producto
+</button>
+
+<!-- Modal para agregar nuevo producto -->
+<div class="modal fade" id="agregarModal" tabindex="-1" role="dialog" aria-labelledby="agregarModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="agregarModalLabel">Agregar Producto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ url_for('guardar_producto') }}" method="POST">
+        <div class="modal-body">
+          <!-- Campos del formulario -->
+          <div class="form-group">
+            <label for="nombre_producto">Nombre</label>
+            <input type="text" class="form-control" id="nombre_producto" name="nombre_producto" required>
+          </div>
+          <div class="form-group">
+            <label for="descripcion_producto">Descripción</label>
+            <input type="text" class="form-control" id="descripcion_producto" name="descripcion_producto" required>
+          </div>
+          <div class="form-group">
+            <label for="valor_producto">Precio</label>
+            <input type="number" class="form-control" id="valor_producto" name="valor_producto" required>
+          </div>
+          <div class="form-group">
+            <label for="cantidad_inicial">Cantidad</label>
+            <input type="number" class="form-control" id="cantidad_inicial" name="cantidad_inicial" required>
+          </div>
+          <div class="form-group">
+            <label for="ID_proveedor">Proveedor</label>
+            <select class="form-control" id="ID_proveedor" name="ID_proveedor" required>
+              {% for proveedor in proveedores %}
+              <option value="{{ proveedor.ID_proveedor }}">{{ proveedor.Nombre_empresa }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de productos -->
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Precio</th>
+      <th>Cantidad</th>
+      <th>Proveedor</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaProductos">
+    {% for producto in data %}
+    <tr>
+      <td>{{ producto.ID_producto }}</td>
+      <td>{{ producto.nombre_producto }}</td>
+      <td>{{ producto.descripcion_producto }}</td>
+      <td>{{ producto.valor_producto }}</td>
+      <td>{{ producto.cantidad_inicial }}</td>
+      <td>{{ producto.ID_proveedor }}</td>
+      <td>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ producto.ID_producto }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            ...
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ producto.ID_producto }}">
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editarModal{{ producto.ID_producto }}">Editar ({{ producto.nombre_producto }})</a>
+            <a class="dropdown-item" href="#" onclick="eliminar('{{ producto.ID_producto }}')">Eliminar ({{ producto.nombre_producto }})</a>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <!-- Modal de edición para cada producto -->
+    <div class="modal fade" id="editarModal{{ producto.ID_producto }}" tabindex="-1" role="dialog" aria-labelledby="editarModalLabel{{ producto.ID_producto }}" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editarModalLabel{{ producto.ID_producto }}">Editar Producto</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form action="{{ url_for('editar_producto', id=producto.ID_producto) }}" method="POST">
+            <div class="modal-body">
+              <!-- Campos del formulario de edición -->
+              <div class="form-group">
+                <label for="nombre_producto">Nombre</label>
+                <input type="text" class="form-control" id="nombre_producto" name="nombre_producto" value="{{ producto.nombre_producto }}" required>
+              </div>
+              <div class="form-group">
+                <label for="descripcion_producto">Descripción</label>
+                <input type="text" class="form-control" id="descripcion_producto" name="descripcion_producto" value="{{ producto.descripcion_producto }}" required>
+              </div>
+              <div class="form-group">
+                <label for="valor_producto">Precio</label>
+                <input type="number" class="form-control" id="valor_producto" name="valor_producto" value="{{ producto.valor_producto }}" required>
+              </div>
+              <div class="form-group">
+                <label for="cantidad_inicial">Cantidad</label>
+                <input type="number" class="form-control" id="cantidad_inicial" name="cantidad_inicial" value="{{ producto.cantidad_inicial }}" required>
+              </div>
+              <div class="form-group">
+                <label for="ID_proveedor">Proveedor</label>
+                <select class="form-control" id="ID_proveedor" name="ID_proveedor" required>
+                  {% for proveedor in proveedores %}
+                  <option value="{{ proveedor.ID_proveedor }}" {% if proveedor.ID_proveedor == producto.ID_proveedor %} selected {% endif %}>{{ proveedor.Nombre_empresa }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Botones de paginación -->
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    <li class="page-item">
+      <button class="page-link" onclick="cargarPaginaAnterior()">Anterior</button>
+    </li>
+    <li class="page-item">
+      <button class="page-link" onclick="cargarPaginaSiguiente()">Ver más</button>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  function filtrar() {
+    var proveedor = document.getElementById("proveedor").value;
+    var precio = document.getElementById("precio").value;
+    var cantidad = document.getElementById("cantidad").value;
+
+    // Realizar la solicitud AJAX para obtener los productos filtrados
+    $.ajax({
+      url: "/filtrar_productos",
+      type: "POST",
+      data: {
+        proveedor: proveedor,
+        precio: precio,
+        cantidad: cantidad
+      },
+      success: function(response) {
+        $("#tablaProductos").html(response);
+      },
+      error: function(xhr, status, error) {
+        console.error("Error al filtrar productos:", error);
+      }
+    });
+  }
+
+  function eliminar(id) {
+    if (confirm("¿Desea eliminar el producto?")) {
+      window.location.href = "/eliminar_producto/" + id;
+    }
+  }
+
+  function cargarPaginaAnterior() {
+    // Implementación de la lógica para cargar la página anterior
+  }
+
+  function cargarPaginaSiguiente() {
+    // Implementación de la lógica para cargar la siguiente página
+  }
+</script>
+{% endblock %}

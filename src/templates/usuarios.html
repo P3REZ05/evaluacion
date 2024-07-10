@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow">
+        <div class="card-body">
+            <!-- Mostrar mensajes flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- Botón para abrir el modal de agregar usuario -->
+            <button class="btn btn-success mb-3" data-toggle="modal" data-target="#addUserModal">Agregar Usuario</button>
+
+            <!-- Modal de agregar usuario -->
+            <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addUserModalLabel">Agregar Usuario</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/usuarios" method="post">
+                                <div class="mb-3">
+                                    <label>ID</label>
+                                    <input type="number" name="ID_usuario" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label>NOMBRE</label>
+                                    <input type="text" name="Nombre" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label>CEDULA</label>
+                                    <input type="number" name="Cedula" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label>FECHA REGISTRO</label>
+                                    <input type="date" name="fecha_registro" class="form-control">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA -->
+            <div style="overflow-y: auto; max-height: 400px;">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">NOMBRE</th>
+                            <th scope="col">CEDULA</th>
+                            <th scope="col">FECHA DE REGISTRO</th>
+                            <th scope="col">EDIT</th>
+                            <th scope="col">DELETE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in data %}
+                        <tr>
+                            <td>{{d.ID_usuario}}</td>
+                            <td>{{d.Nombre}}</td>
+                            <td>{{d.cedula}}</td>
+                            <td>{{d.fecha_registro}}</td>
+                            <td><button class="btn btn-primary btn-sm" id="btn-edit{{d.ID_usuario}}" data-toggle="modal" data-target="#modal{{d.ID_usuario}}">Edit</button></td>
+                            <td><a href="{{url_for('delete', id=d.ID_usuario)}}" class="btn btn-danger btn-sm">DELETE</a></td>
+                        </tr>
+
+                        <!--MODAL-->
+                        <div class="modal fade" id="modal{{d.ID_usuario}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h1 class="modal-title fs-5" id="exampleModalLabel">{{d.Nombre}}</h1>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  <form action="/edit/{{d.ID_usuario}}" method="post">
+                                    <label>ID</label>
+                                    <input type="number" name="ID_usuario" class="form-control mb-3" value="{{d.ID_usuario}}">
+                                    <label>NOMBRE</label>
+                                    <input type="text" name="Nombre" class="form-control mb-3" value="{{d.Nombre}}">
+                                    <label>CEDULA</label>
+                                    <input type="number" name="Cedula" class="form-control mb-3" value="{{d.cedula}}">
+                                    <label>FECHA REGISTRO</label>
+                                    <input type="date" name="fecha_registro" class="form-control mb-3" value="{{d.fecha_registro}}">
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Guardar</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
